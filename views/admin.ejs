@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Candidates</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="wrap" style="max-width: 1000px;">
+    <div class="topbar">
+      <div>
+        <div class="terminal-tag"><span class="cursor"></span> admin/dashboard</div>
+        <h1>Candidates (<%= candidates.length %>)</h1>
+      </div>
+      <a href="/admin/logout" class="btn">Logout</a>
+    </div>
+
+    <% if (candidates.length === 0) { %>
+      <div class="card center-box">
+        <p class="subtitle" style="margin:0;">Abhi tak koi application nahi aayi hai.</p>
+      </div>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Naam</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% candidates.forEach(c => { %>
+            <tr>
+              <td><%= c.name %></td>
+              <td><%= c.email %></td>
+              <td><%= c.phone || '—' %></td>
+              <td><%= new Date(c.submittedAt).toLocaleString('en-IN') %></td>
+              <td><span class="status-pill status-<%= c.status %>"><%= c.status %></span></td>
+              <td><a href="/admin/candidate/<%= c.id %>">Dekhein &rarr;</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

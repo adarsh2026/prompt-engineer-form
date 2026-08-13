@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Engineer - Job Application</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="terminal-tag"><span class="cursor"></span> hiring/prompt-engineer</div>
+    <h1>Prompt Engineer Application</h1>
+    <p class="subtitle">Neeche apni details bharein. Resume upload karna zaroori hai, baaki saare questions optional hain — jitna bhar sakein utna bharein.</p>
+
+    <% if (error) { %>
+      <div class="error-box"><%= error %></div>
+    <% } %>
+
+    <form action="/submit" method="POST" enctype="multipart/form-data">
+      <div class="card">
+        <div class="section-title">Basic Details</div>
+        <div class="field">
+          <label class="required">Poora Naam</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="field">
+          <label class="required">Email</label>
+          <input type="email" name="email" required>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" name="phone">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Resume</div>
+        <div class="field">
+          <label class="required">Resume Upload (PDF / DOC / DOCX, max 5MB)</label>
+          <div class="file-drop">
+            <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Prompt Engineering Questions <span class="optional-tag">(sab optional)</span></div>
+        <% questions.forEach((q, i) => { %>
+          <div class="field">
+            <div class="q-line">
+              <span class="q-num">Q<%= String(i+1).padStart(2,'0') %></span>
+              <span class="q-text"><%= q %> <span class="optional-tag">(optional)</span></span>
+            </div>
+            <textarea name="q<%= i %>" placeholder="Apna jawab yahan likhein..."></textarea>
+          </div>
+        <% }) %>
+      </div>
+
+      <button type="submit" class="btn-accent">Application Submit Karein &rarr;</button>
+    </form>
+  </div>
+</body>
+</html>

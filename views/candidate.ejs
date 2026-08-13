@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= candidate.name %> - Application</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="wrap">
+    <a href="/admin" class="back-link">&larr; Sab candidates</a>
+    <div class="terminal-tag"><span class="cursor"></span> candidate/<%= candidate.id %></div>
+    <h1><%= candidate.name %></h1>
+
+    <div class="card">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="label">Email</div>
+          <div class="value"><%= candidate.email %></div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Phone</div>
+          <div class="value"><%= candidate.phone || '—' %></div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Submitted</div>
+          <div class="value"><%= new Date(candidate.submittedAt).toLocaleString('en-IN') %></div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Status</div>
+          <div class="value"><span class="status-pill status-<%= candidate.status %>"><%= candidate.status %></span></div>
+        </div>
+      </div>
+
+      <a href="/admin/resume/<%= candidate.resumeFile %>" target="_blank" class="btn-accent btn">Resume Download / Dekhein &darr;</a>
+
+      <form action="/admin/candidate/<%= candidate.id %>/status" method="POST" class="status-form" style="margin-top:20px;">
+        <select name="status">
+          <option value="Pending" <%= candidate.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+          <option value="Shortlisted" <%= candidate.status === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+          <option value="Rejected" <%= candidate.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+        </select>
+        <button type="submit">Status Update Karein</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Prompt Engineering Answers</div>
+      <% candidate.answers.forEach((qa, i) => { %>
+        <div class="qa-block">
+          <div class="q-line">
+            <span class="q-num">Q<%= String(i+1).padStart(2,'0') %></span>
+            <span class="q-text"><%= qa.question %></span>
+          </div>
+          <% if (qa.answer && qa.answer.trim()) { %>
+            <div class="qa-answer"><%= qa.answer %></div>
+          <% } else { %>
+            <div class="qa-empty">Jawab nahi diya gaya</div>
+          <% } %>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</body>
+</html>
