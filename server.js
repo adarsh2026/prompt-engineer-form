@@ -15,21 +15,21 @@ const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // ---------- 15 Prompt Engineering Questions ----------
 const QUESTIONS = [
-  "Prompt engineering kya hota hai, apne shabdon mein samjhaiye?",
-  "Zero-shot aur few-shot prompting mein kya fark hai?",
-  "Chain-of-thought prompting kya hai aur kab use karte hain?",
-  "Ek prompt likhiye jo AI se ek professional email likhwaye.",
-  "Agar AI ka output expected format mein nahi aa raha to prompt kaise fix karenge?",
-  "System prompt aur user prompt mein kya antar hai?",
-  "Aapne kis AI tool/model ke saath sabse zyada kaam kiya hai? (ChatGPT, Claude, Gemini, etc.)",
-  "Hallucination kya hota hai AI models mein, aur ise prompting se kaise kam karte hain?",
-  "Temperature aur top-p parameters kya control karte hain?",
-  "Ek complex task ko chhote steps mein todkar prompt kaise design karenge?",
-  "Kisi prompt ko debug/improve kaise karte hain jab result achha na aaye?",
-  "Role-based prompting (persona assign karna) kya hota hai? Example dijiye.",
-  "RAG (Retrieval Augmented Generation) ke baare mein aap kya jaante hain?",
-  "Prompt injection attack kya hota hai aur usse kaise bachein?",
-  "Prompt engineering mein apna experience/portfolio kaise describe karenge?"
+  "In your own words, what is prompt engineering?",
+  "What is the difference between zero-shot and few-shot prompting?",
+  "What is chain-of-thought prompting and when do you use it?",
+  "Write a prompt that would get an AI to draft a professional email.",
+  "If an AI's output isn't coming in the expected format, how would you fix the prompt?",
+  "What is the difference between a system prompt and a user prompt?",
+  "Which AI tool/model have you worked with the most? (ChatGPT, Claude, Gemini, etc.)",
+  "What is hallucination in AI models, and how can prompting reduce it?",
+  "What do temperature and top-p parameters control?",
+  "How would you design a prompt that breaks a complex task into smaller steps?",
+  "How do you debug/improve a prompt when the result isn't good?",
+  "What is role-based prompting (assigning a persona)? Give an example.",
+  "What do you know about RAG (Retrieval Augmented Generation)?",
+  "What is a prompt injection attack, and how do you protect against it?",
+  "How would you describe your experience/portfolio in prompt engineering?"
 ];
 
 // ---------- Ensure data files exist ----------
@@ -65,7 +65,7 @@ const upload = multer({
     const allowed = ['.pdf', '.doc', '.docx'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error('Sirf PDF, DOC ya DOCX resume allowed hai'));
+    else cb(new Error('Only PDF, DOC or DOCX resumes are allowed'));
   }
 });
 
@@ -98,13 +98,13 @@ app.post('/submit', (req, res) => {
       return res.render('form', { questions: QUESTIONS, error: err.message });
     }
     if (!req.file) {
-      return res.render('form', { questions: QUESTIONS, error: 'Resume upload karna zaroori hai.' });
+      return res.render('form', { questions: QUESTIONS, error: 'Resume upload is required.' });
     }
 
     const { name, email, phone } = req.body;
     if (!name || !email) {
       fs.unlinkSync(req.file.path); // cleanup uploaded file
-      return res.render('form', { questions: QUESTIONS, error: 'Naam aur Email zaroori hai.' });
+      return res.render('form', { questions: QUESTIONS, error: 'Name and Email are required.' });
     }
 
     const answers = QUESTIONS.map((q, i) => ({
@@ -146,7 +146,7 @@ app.post('/admin/login', (req, res) => {
     req.session.isAdmin = true;
     return res.redirect('/admin');
   }
-  res.render('login', { error: 'Galat password. Dobara try karein.' });
+  res.render('login', { error: 'Wrong password. Please try again.' });
 });
 
 app.get('/admin/logout', (req, res) => {
@@ -162,7 +162,7 @@ app.get('/admin', requireAuth, (req, res) => {
 app.get('/admin/candidate/:id', requireAuth, (req, res) => {
   const candidates = readCandidates();
   const candidate = candidates.find(c => c.id === req.params.id);
-  if (!candidate) return res.status(404).send('Candidate nahi mila');
+  if (!candidate) return res.status(404).send('Candidate not found');
   res.render('candidate', { candidate });
 });
 
@@ -179,10 +179,10 @@ app.post('/admin/candidate/:id/status', requireAuth, (req, res) => {
 // Protected resume download - only admin can access
 app.get('/admin/resume/:filename', requireAuth, (req, res) => {
   const filePath = path.join(UPLOADS_DIR, req.params.filename);
-  if (!fs.existsSync(filePath)) return res.status(404).send('File nahi mili');
+  if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
   res.sendFile(filePath);
 });
 
 app.listen(PORT, () => {
-  console.log(`Server chal raha hai: http://localhost:${PORT}`);
+  console.log(`Server running at: http://localhost:${PORT}`);
 });

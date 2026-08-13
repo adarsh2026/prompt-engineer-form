@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,13 +18,13 @@
 
     <% if (candidates.length === 0) { %>
       <div class="card center-box">
-        <p class="subtitle" style="margin:0;">Abhi tak koi application nahi aayi hai.</p>
+        <p class="subtitle" style="margin:0;">No applications have come in yet.</p>
       </div>
     <% } else { %>
       <table>
         <thead>
           <tr>
-            <th>Naam</th>
+            <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>Submitted</th>
@@ -40,7 +40,7 @@
               <td><%= c.phone || '—' %></td>
               <td><%= new Date(c.submittedAt).toLocaleString('en-IN') %></td>
               <td><span class="status-pill status-<%= c.status %>"><%= c.status %></span></td>
-              <td><a href="/admin/candidate/<%= c.id %>">Dekhein &rarr;</a></td>
+              <td><a href="/admin/candidate/<%= c.id %>">View &rarr;</a></td>
             </tr>
           <% }) %>
         </tbody>

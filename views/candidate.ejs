@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="wrap">
-    <a href="/admin" class="back-link">&larr; Sab candidates</a>
+    <a href="/admin" class="back-link">&larr; All candidates</a>
     <div class="terminal-tag"><span class="cursor"></span> candidate/<%= candidate.id %></div>
     <h1><%= candidate.name %></h1>
 
@@ -32,7 +32,7 @@
         </div>
       </div>
 
-      <a href="/admin/resume/<%= candidate.resumeFile %>" target="_blank" class="btn-accent btn">Resume Download / Dekhein &darr;</a>
+      <a href="/admin/resume/<%= candidate.resumeFile %>" target="_blank" class="btn-accent btn">Download / View Resume &darr;</a>
 
       <form action="/admin/candidate/<%= candidate.id %>/status" method="POST" class="status-form" style="margin-top:20px;">
         <select name="status">
@@ -40,7 +40,7 @@
           <option value="Shortlisted" <%= candidate.status === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
           <option value="Rejected" <%= candidate.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
         </select>
-        <button type="submit">Status Update Karein</button>
+        <button type="submit">Update Status</button>
       </form>
     </div>
 
@@ -55,7 +55,7 @@
           <% if (qa.answer && qa.answer.trim()) { %>
             <div class="qa-answer"><%= qa.answer %></div>
           <% } else { %>
-            <div class="qa-empty">Jawab nahi diya gaya</div>
+            <div class="qa-empty">No answer given</div>
           <% } %>
         </div>
       <% }) %>
