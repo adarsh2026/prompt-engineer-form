@@ -13,7 +13,11 @@
         <div class="terminal-tag"><span class="cursor"></span> admin/dashboard</div>
         <h1>Candidates (<%= candidates.length %>)</h1>
       </div>
-      <a href="/admin/logout" class="btn">Logout</a>
+      <div>
+        <a href="/admin/message" class="btn" style="margin-right:8px;">Send Message</a>
+        <a href="/admin/settings" class="btn" style="margin-right:8px;">Settings</a>
+        <a href="/admin/logout" class="btn">Logout</a>
+      </div>
     </div>
 
     <% if (candidates.length === 0) { %>

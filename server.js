@@ -4,6 +4,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { sendMail } = require('./mailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'change-this-secret-in-production';
 
 const DATA_FILE = path.join(__dirname, 'data', 'candidates.json');
+const SETTINGS_FILE = path.join(__dirname, 'data', 'settings.json');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // ---------- 15 Prompt Engineering Questions ----------
@@ -47,6 +49,20 @@ function readCandidates() {
 
 function writeCandidates(list) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2));
+}
+
+if (!fs.existsSync(SETTINGS_FILE)) fs.writeFileSync(SETTINGS_FILE, JSON.stringify({ notifyEmail: '' }));
+
+function readSettings() {
+  try {
+    return JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf-8'));
+  } catch (e) {
+    return { notifyEmail: '' };
+  }
+}
+
+function writeSettings(settings) {
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2));
 }
 
 // ---------- Multer setup for resume upload ----------
@@ -130,6 +146,15 @@ app.post('/submit', (req, res) => {
     candidates.unshift(newCandidate);
     writeCandidates(candidates);
 
+    const settings = readSettings();
+    if (settings.notifyEmail) {
+      sendMail({
+        to: settings.notifyEmail,
+        subject: `New Application - ${newCandidate.name}`,
+        text: `A new candidate has applied for the Prompt Engineer role.\n\nName: ${newCandidate.name}\nEmail: ${newCandidate.email}\nPhone: ${newCandidate.phone || '-'}\nSubmitted: ${new Date(newCandidate.submittedAt).toLocaleString('en-IN')}\n\nLog into the admin panel to view the full application and resume.`
+      }).catch(err => console.error('Notification email failed:', err.message));
+    }
+
     req.session.justApplied = true;
     res.redirect('/thank-you');
   });
@@ -189,6 +214,40 @@ app.get('/admin/resume/:filename', requireAuth, (req, res) => {
   const filePath = path.join(UPLOADS_DIR, req.params.filename);
   if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
   res.sendFile(filePath);
+});
+
+// ---------- Admin: Notification Email Settings ----------
+app.get('/admin/settings', requireAuth, (req, res) => {
+  res.render('settings', { settings: readSettings(), saved: false, error: null });
+});
+
+app.post('/admin/settings', requireAuth, (req, res) => {
+  const notifyEmail = (req.body.notifyEmail || '').trim();
+  writeSettings({ notifyEmail });
+  res.render('settings', { settings: { notifyEmail }, saved: true, error: null });
+});
+
+// ---------- Admin: Send a Manual Message ----------
+app.get('/admin/message', requireAuth, (req, res) => {
+  const settings = readSettings();
+  res.render('message', { defaultTo: settings.notifyEmail, sent: false, error: null, subject: '', message: '' });
+});
+
+app.post('/admin/message', requireAuth, async (req, res) => {
+  const { to, subject, message } = req.body;
+  const trimmedTo = (to || '').trim();
+  const trimmedMessage = (message || '').trim();
+
+  if (!trimmedTo || !trimmedMessage) {
+    return res.render('message', { defaultTo: trimmedTo, sent: false, error: 'Please fill in the recipient email and a message.', subject, message });
+  }
+
+  try {
+    await sendMail({ to: trimmedTo, subject: subject || 'Message from Hiring Team', text: trimmedMessage });
+    res.render('message', { defaultTo: trimmedTo, sent: true, error: null, subject: '', message: '' });
+  } catch (e) {
+    res.render('message', { defaultTo: trimmedTo, sent: false, error: 'Failed to send: ' + e.message, subject, message });
+  }
 });
 
 app.listen(PORT, () => {

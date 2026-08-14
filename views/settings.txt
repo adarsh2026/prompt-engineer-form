@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Settings</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="wrap" style="max-width: 560px;">
+    <a href="/admin" class="back-link">&larr; Back to candidates</a>
+    <div class="terminal-tag"><span class="cursor"></span> admin/settings</div>
+    <h1 style="font-size: 24px;">Notification Settings</h1>
+    <p class="subtitle">Every time someone submits an application, an email will be sent automatically to the address below.</p>
+
+    <% if (saved) { %>
+      <div class="success-box">Saved. Notifications will now go to <%= settings.notifyEmail %>.</div>
+    <% } %>
+    <% if (error) { %>
+      <div class="error-box"><%= error %></div>
+    <% } %>
+
+    <form action="/admin/settings" method="POST" class="card">
+      <div class="field">
+        <label class="required">Send notifications to (real email)</label>
+        <input type="email" name="notifyEmail" value="<%= settings.notifyEmail || '' %>" placeholder="you@gmail.com" required>
+        <div class="hint">Leave this blank and save to turn off automatic notifications.</div>
+      </div>
+      <button type="submit" class="btn-accent" style="width:100%;">Save Settings</button>
+    </form>
+  </div>
+</body>
+</html>

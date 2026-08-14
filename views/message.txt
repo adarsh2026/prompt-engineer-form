@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Message</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="wrap" style="max-width: 560px;">
+    <a href="/admin" class="back-link">&larr; Back to candidates</a>
+    <div class="terminal-tag"><span class="cursor"></span> admin/send-message</div>
+    <h1 style="font-size: 24px;">Send a Message</h1>
+    <p class="subtitle">Send a one-off email from the hiring inbox to any address.</p>
+
+    <% if (sent) { %>
+      <div class="success-box">Message sent successfully.</div>
+    <% } %>
+    <% if (error) { %>
+      <div class="error-box"><%= error %></div>
+    <% } %>
+
+    <form action="/admin/message" method="POST" class="card">
+      <div class="field">
+        <label class="required">To</label>
+        <input type="email" name="to" value="<%= defaultTo || '' %>" placeholder="someone@gmail.com" required>
+      </div>
+      <div class="field">
+        <label>Subject</label>
+        <input type="text" name="subject" value="<%= subject || '' %>" placeholder="Subject line">
+      </div>
+      <div class="field">
+        <label class="required">Message</label>
+        <textarea name="message" placeholder="Type your message here..." style="min-height: 160px;" required><%= message || '' %></textarea>
+      </div>
+      <button type="submit" class="btn-accent" style="width:100%;">Send</button>
+    </form>
+  </div>
+</body>
+</html>
