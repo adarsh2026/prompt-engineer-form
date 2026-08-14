@@ -15,21 +15,21 @@ const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
 // ---------- 15 Prompt Engineering Questions ----------
 const QUESTIONS = [
-  "In your own words, what is prompt engineering?",
-  "What is the difference between zero-shot and few-shot prompting?",
-  "What is chain-of-thought prompting and when do you use it?",
-  "Write a prompt that would get an AI to draft a professional email.",
-  "If an AI's output isn't coming in the expected format, how would you fix the prompt?",
-  "What is the difference between a system prompt and a user prompt?",
-  "Which AI tool/model have you worked with the most? (ChatGPT, Claude, Gemini, etc.)",
-  "What is hallucination in AI models, and how can prompting reduce it?",
-  "What do temperature and top-p parameters control?",
-  "How would you design a prompt that breaks a complex task into smaller steps?",
-  "How do you debug/improve a prompt when the result isn't good?",
-  "What is role-based prompting (assigning a persona)? Give an example.",
-  "What do you know about RAG (Retrieval Augmented Generation)?",
-  "What is a prompt injection attack, and how do you protect against it?",
-  "How would you describe your experience/portfolio in prompt engineering?"
+  "In simple words, what is a 'prompt' when using AI tools like ChatGPT or Claude?",
+  "Which AI tools have you used before? (ChatGPT, Claude, Gemini, etc.)",
+  "Write an example prompt you'd use to ask an AI to summarize a long article.",
+  "If an AI gives you a confusing or wrong answer, what would you try next?",
+  "What does it mean to give an AI 'clear instructions'? Why does it matter?",
+  "Why do you think giving an AI a few examples can help it give a better answer?",
+  "What's the difference between asking AI a short question vs. giving it detailed instructions?",
+  "Have you ever asked an AI to act like a specific person or expert (e.g. 'act as a teacher')? What happened?",
+  "Why might an AI sometimes give an answer that isn't true or accurate?",
+  "If you wanted an AI to reply in a certain tone (funny, formal, simple), how would you ask for that?",
+  "How would you break a big task into smaller steps before asking an AI for help with it?",
+  "What do you enjoy most about working with AI tools?",
+  "Have you ever rewritten a prompt a few times to get a better result? What did you change?",
+  "In your opinion, what makes someone good at writing prompts for AI?",
+  "Tell us a bit about your interest in prompt engineering as a career."
 ];
 
 // ---------- Ensure data files exist ----------
