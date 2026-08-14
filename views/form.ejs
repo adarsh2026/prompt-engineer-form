@@ -8,56 +8,138 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="terminal-tag"><span class="cursor"></span>Duplex Technologies Services Pvt Ltd Lucknow</div>
-    <h1>Prompt Engineer Application</h1>
-    <p class="subtitle">Fill in your details below. Resume upload is required — all other questions are optional, answer as many as you can.</p>
 
-    <% if (error) { %>
-      <div class="error-box"><%= error %></div>
-    <% } %>
-
-    <form action="/submit" method="POST" enctype="multipart/form-data">
-      <div class="card">
-        <div class="section-title">Basic Details</div>
-        <div class="field">
-          <label class="required">Full Name</label>
-          <input type="text" name="name" required>
-        </div>
-        <div class="field">
-          <label class="required">Email</label>
-          <input type="email" name="email" required>
-        </div>
-        <div class="field">
-          <label>Phone Number</label>
-          <input type="tel" name="phone">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Resume</div>
-        <div class="field">
-          <label class="required">Resume Upload (PDF / DOC / DOCX, max 5MB)</label>
-          <div class="file-drop">
-            <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+    <!-- START SCREEN -->
+    <div id="startScreen">
+      <div class="terminal-tag"><span class="cursor"></span> hiring/prompt-engineer</div>
+      <h1>Prompt Engineer Application</h1>
+      <p class="subtitle">This application includes a short resume upload and 15 optional questions about prompt engineering. Once you click Start, a timer will begin so we know how long the assessment took — there's no strict time limit, so take the time you need.</p>
+      <div class="card start-card">
+        <div class="start-info">
+          <div class="start-info-item">
+            <div class="start-info-label">Questions</div>
+            <div class="start-info-value">15 (all optional)</div>
+          </div>
+          <div class="start-info-item">
+            <div class="start-info-label">Resume</div>
+            <div class="start-info-value">Required</div>
+          </div>
+          <div class="start-info-item">
+            <div class="start-info-label">Suggested time</div>
+            <div class="start-info-value">~15-20 min</div>
           </div>
         </div>
+        <button type="button" id="startBtn" class="btn-accent">Start Application &rarr;</button>
+      </div>
+    </div>
+
+    <!-- FORM SCREEN (hidden until Start is clicked) -->
+    <div id="formScreen" style="display:none;">
+      <div class="timer-bar">
+        <span class="timer-dot"></span>
+        <span id="timerDisplay">00:00</span>
+        <span class="timer-label">time elapsed</span>
       </div>
 
-      <div class="card">
-        <div class="section-title">Prompt Engineering Questions <span class="optional-tag">(all optional)</span></div>
-        <% questions.forEach((q, i) => { %>
+      <h1>Prompt Engineer Application</h1>
+      <p class="subtitle">Fill in your details below. Resume upload is required — all other questions are optional, answer as many as you can.</p>
+
+      <% if (error) { %>
+        <div class="error-box"><%= error %></div>
+      <% } %>
+
+      <form action="/submit" method="POST" enctype="multipart/form-data" id="applicationForm">
+        <input type="hidden" name="timeTaken" id="timeTakenInput" value="0">
+
+        <div class="card">
+          <div class="section-title">Basic Details</div>
           <div class="field">
-            <div class="q-line">
-              <span class="q-num">Q<%= String(i+1).padStart(2,'0') %></span>
-              <span class="q-text"><%= q %> <span class="optional-tag">(optional)</span></span>
-            </div>
-            <textarea name="q<%= i %>" placeholder="Type your answer here..."></textarea>
+            <label class="required">Full Name</label>
+            <input type="text" name="name" required>
           </div>
-        <% }) %>
-      </div>
+          <div class="field">
+            <label class="required">Email</label>
+            <input type="email" name="email" required>
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <input type="tel" name="phone">
+          </div>
+        </div>
 
-      <button type="submit" class="btn-accent">Submit Application &rarr;</button>
-    </form>
+        <div class="card">
+          <div class="section-title">Resume</div>
+          <div class="field">
+            <label class="required">Resume Upload (PDF / DOC / DOCX, max 5MB)</label>
+            <div class="file-drop">
+              <input type="file" name="resume" accept=".pdf,.doc,.docx" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Prompt Engineering Questions <span class="optional-tag">(all optional)</span></div>
+          <% questions.forEach((q, i) => { %>
+            <div class="field">
+              <div class="q-line">
+                <span class="q-num">Q<%= String(i+1).padStart(2,'0') %></span>
+                <span class="q-text"><%= q %> <span class="optional-tag">(optional)</span></span>
+              </div>
+              <textarea name="q<%= i %>" placeholder="Type your answer here..." class="answer-box" data-index="<%= i %>"></textarea>
+              <div class="char-count" id="charCount<%= i %>">0 characters</div>
+            </div>
+          <% }) %>
+        </div>
+
+        <button type="submit" class="btn-accent" id="submitBtn">Submit Application &rarr;</button>
+      </form>
+    </div>
   </div>
+
+  <script>
+    const startScreen = document.getElementById('startScreen');
+    const formScreen = document.getElementById('formScreen');
+    const startBtn = document.getElementById('startBtn');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timeTakenInput = document.getElementById('timeTakenInput');
+    const applicationForm = document.getElementById('applicationForm');
+
+    let startTime = null;
+    let timerInterval = null;
+
+    function formatTime(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+      const s = (totalSeconds % 60).toString().padStart(2, '0');
+      return m + ':' + s;
+    }
+
+    startBtn.addEventListener('click', () => {
+      startScreen.style.display = 'none';
+      formScreen.style.display = 'block';
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        timerDisplay.textContent = formatTime(elapsed);
+      }, 1000);
+      window.scrollTo(0, 0);
+    });
+
+    applicationForm.addEventListener('submit', () => {
+      if (startTime) {
+        const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+        timeTakenInput.value = elapsedSeconds;
+      }
+      if (timerInterval) clearInterval(timerInterval);
+    });
+
+    // Live character count per answer
+    document.querySelectorAll('.answer-box').forEach(box => {
+      box.addEventListener('input', () => {
+        const i = box.getAttribute('data-index');
+        const count = box.value.length;
+        document.getElementById('charCount' + i).textContent = count + ' characters';
+      });
+    });
+  </script>
 </body>
 </html>
