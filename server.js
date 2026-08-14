@@ -112,6 +112,8 @@ app.post('/submit', (req, res) => {
       answer: (req.body['q' + i] || '').trim()
     }));
 
+    const timeTakenSeconds = parseInt(req.body.timeTaken, 10) || 0;
+
     const candidates = readCandidates();
     const newCandidate = {
       id: Date.now().toString(36) + crypto.randomBytes(4).toString('hex'),
@@ -119,6 +121,7 @@ app.post('/submit', (req, res) => {
       email: email.trim(),
       phone: (phone || '').trim(),
       answers,
+      timeTakenSeconds,
       resumeFile: req.file.filename,
       resumeOriginalName: req.file.originalname,
       status: 'Pending',
@@ -127,11 +130,16 @@ app.post('/submit', (req, res) => {
     candidates.unshift(newCandidate);
     writeCandidates(candidates);
 
+    req.session.justApplied = true;
     res.redirect('/thank-you');
   });
 });
 
 app.get('/thank-you', (req, res) => {
+  if (!req.session || !req.session.justApplied) {
+    return res.redirect('/');
+  }
+  req.session.justApplied = false; // one-time view, refresh won't keep showing it after leaving
   res.render('thankyou');
 });
 

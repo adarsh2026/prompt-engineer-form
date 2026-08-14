@@ -13,20 +13,20 @@
     <div id="startScreen">
       <div class="terminal-tag"><span class="cursor"></span> hiring/prompt-engineer</div>
       <h1>Prompt Engineer Application</h1>
-      <p class="subtitle">This application includes a short resume upload and 15 optional questions about prompt engineering. Once you click Start, a timer will begin so we know how long the assessment took — there's no strict time limit, so take the time you need.</p>
+      <p class="subtitle">This application includes a resume upload and 15 optional questions about prompt engineering. Once you click Start, a 15-minute timer begins and the form will auto-submit when time runs out — so make sure you're ready before starting.</p>
       <div class="card start-card">
         <div class="start-info">
           <div class="start-info-item">
             <div class="start-info-label">Questions</div>
-            <div class="start-info-value">15 (all optional)</div>
+            <div class="start-info-value">15 (optional)</div>
           </div>
           <div class="start-info-item">
             <div class="start-info-label">Resume</div>
             <div class="start-info-value">Required</div>
           </div>
           <div class="start-info-item">
-            <div class="start-info-label">Suggested time</div>
-            <div class="start-info-value">~15-20 min</div>
+            <div class="start-info-label">Time limit</div>
+            <div class="start-info-value">15 minutes</div>
           </div>
         </div>
         <button type="button" id="startBtn" class="btn-accent">Start Application &rarr;</button>
@@ -35,10 +35,14 @@
 
     <!-- FORM SCREEN (hidden until Start is clicked) -->
     <div id="formScreen" style="display:none;">
-      <div class="timer-bar">
+      <div class="timer-bar" id="timerBar">
         <span class="timer-dot"></span>
-        <span id="timerDisplay">00:00</span>
-        <span class="timer-label">time elapsed</span>
+        <span id="timerDisplay">15:00</span>
+        <span class="timer-label">time remaining</span>
+      </div>
+
+      <div id="autoSubmitNotice" class="auto-submit-notice" style="display:none;">
+        &#9203; Time's up — submitting your application now...
       </div>
 
       <h1>Prompt Engineer Application</h1>
@@ -97,15 +101,21 @@
   </div>
 
   <script>
+    const TIME_LIMIT_SECONDS = 15 * 60; // change this number to adjust the time limit
+
     const startScreen = document.getElementById('startScreen');
     const formScreen = document.getElementById('formScreen');
     const startBtn = document.getElementById('startBtn');
+    const timerBar = document.getElementById('timerBar');
     const timerDisplay = document.getElementById('timerDisplay');
     const timeTakenInput = document.getElementById('timeTakenInput');
     const applicationForm = document.getElementById('applicationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const autoSubmitNotice = document.getElementById('autoSubmitNotice');
 
     let startTime = null;
     let timerInterval = null;
+    let autoSubmitted = false;
 
     function formatTime(totalSeconds) {
       const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
@@ -113,19 +123,39 @@
       return m + ':' + s;
     }
 
+    function tick() {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      const remaining = TIME_LIMIT_SECONDS - elapsed;
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = '00:00';
+        timeTakenInput.value = TIME_LIMIT_SECONDS;
+        autoSubmitted = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        autoSubmitNotice.style.display = 'block';
+        window.scrollTo(0, 0);
+        setTimeout(() => applicationForm.submit(), 800);
+        return;
+      }
+
+      timerDisplay.textContent = formatTime(remaining);
+      if (remaining <= 120) {
+        timerBar.classList.add('timer-warning');
+      }
+    }
+
     startBtn.addEventListener('click', () => {
       startScreen.style.display = 'none';
       formScreen.style.display = 'block';
       startTime = Date.now();
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        timerDisplay.textContent = formatTime(elapsed);
-      }, 1000);
+      timerInterval = setInterval(tick, 1000);
       window.scrollTo(0, 0);
     });
 
     applicationForm.addEventListener('submit', () => {
-      if (startTime) {
+      if (startTime && !autoSubmitted) {
         const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
         timeTakenInput.value = elapsedSeconds;
       }
